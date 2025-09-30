@@ -1,36 +1,43 @@
 'use strict';
 
 // write code here
-const parseSalary = (salaryStr) => Number(salaryStr.replace(/[^0-9.-]+/g, ''));
+const parseSalary = (salaryStr) => {
+  if (!salaryStr) {
+    return 0;
+  }
 
-// Сортує список співробітників за спаданням зарплати
-const sortList = (list) => {
-  const items = Array.from(list);
-  const sorted = items.sort(
+  return Number(salaryStr.replace(/[^0-9.-]+/g, ''));
+};
+
+// Сортує список <ul> за спаданням зарплати
+const sortList = (ulElement) => {
+  const items = Array.from(ulElement.querySelectorAll('li'));
+
+  items.sort(
     (a, b) => parseSalary(b.dataset.salary) - parseSalary(a.dataset.salary),
   );
 
-  const ul = list[0].parentElement;
+  // appendChild переміщує елементи у правильному порядку
+  items.forEach((item) => ulElement.appendChild(item));
 
-  sorted.forEach((item) => ul.appendChild(item));
-
-  return sorted;
+  return items; // повертаємо масив на випадок подальшого використання
 };
 
-// Повертає масив співробітників у вигляді об’єктів
-const getEmployees = (list) =>
-  Array.from(list).map((item) => ({
-    name: item.textContent.trim(),
+// Повертає масив співробітників з data-* атрибутів
+const getEmployees = (ulElement) => {
+  const items = Array.from(ulElement.querySelectorAll('li'));
+
+  return items.map((item) => ({
+    name: item.dataset.name,
     position: item.dataset.position,
     salary: parseSalary(item.dataset.salary),
     age: Number(item.dataset.age),
   }));
+};
 
-// Виконання
-const sortedItems = sortList(document.querySelectorAll('li'));
-const employees = getEmployees(sortedItems);
+// Виклик функцій
+const list = document.querySelector('ul'); // знаходимо список
 
-const pre = document.createElement('pre');
+sortList(list); // сортуємо елементи
 
-pre.textContent = JSON.stringify(employees, null, 2);
-document.body.appendChild(pre);
+getEmployees(list);
